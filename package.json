@@ -1,0 +1,29 @@
+{
+  "name": "workspace-integration-sample",
+  "version": "1.0.0",
+  "description": "Example oof a workspace integration",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wxsd-sales/workspace-integration-sample.git"
+  },
+  "author": "Victor Vazquez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wxsd-sales/workspace-integration-sample/issues"
+  },
+  "homepage": "https://github.com/wxsd-sales/workspace-integration-sample#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "workspace-integrations": "^0.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
