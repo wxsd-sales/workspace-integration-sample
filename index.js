@@ -32,7 +32,7 @@ const processSensorValues = async (integration) => {
   
   console.log ('Sending information to external system: ', sensorData);
   const response = await sendInfoToExternalsystem(sensorData);
-  console.log ('External System reponse:', response.ok);
+  console.log ('External System reponse:', response);
 }
 
 const getSensorsValues = async (integration) => {
@@ -81,6 +81,16 @@ const getSensorsValues = async (integration) => {
   }
   catch (error) {
     console.log ('Error getting info from sensors:', error);
+    return {
+      temperature: null,
+      humidity: null,
+      airQuality: null,
+      soundLevel: null,
+      ambientNoise: null,
+      presence: null,
+      peopleCount: null,
+      capacity: null
+    }
   }
 }
 
@@ -146,11 +156,18 @@ const sendInfoToExternalsystem = async (sensorData) => {
         "Value": sensorData.peopleCount
       },
       {
-        "Label": "Room MAx Capacity",
+        "Label": "Room Max Capacity",
         "Unit": "persons",
         "Value": sensorData.capacity
       }
-    ]    
+    ].filter(metric => metric.Value !== '' && metric.Value !== null && metric.Value !== undefined)
+    
+    // API will fail if no metric is sent
+    if (metrics.length === 0) {
+      console.log('No valid sensor data to send, skipping API call');
+      return;
+    }
+
     body = {
       "ID": itemId,
       "Entity": entity,
@@ -208,12 +225,14 @@ const main = async () => {
       return
   });
   
+  
   // This is not used, just one example of how to get the value instead of suscribe to the event
   const value = await integration.xapi.status.get(deviceId, 'RoomAnalytics.PeoplePresence').catch(e => {
       console.error(e)
       return
   });
   console.log ('People Presence:', value);
+  
 
   // Listener for people presence change
   integration.xapi.status.on('RoomAnalytics.PeoplePresence', (deviceId, path, value, data) => {
@@ -259,6 +278,17 @@ app.post('/webhook', async (req, res) => {
     },
     body: JSON.stringify(body)
   };
+
+  //temporal: send also to requesrcatcher
+  let tempOptions = {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify('alarm')
+
+  } 
+  await fetch('https://wazquez.requestcatcher.com/', tempOptions)
 
   try {
     response = await fetch(incidentsUrl, options);
